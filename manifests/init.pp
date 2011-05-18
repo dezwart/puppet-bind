@@ -1,3 +1,19 @@
+# Bind DNS Server
+#
+# == Parameters
+#
+# [*forwarders*]
+#   Specify one or more recursive forwarders as IP addresses in dotted quad
+#   format.
+#
+# == Variables
+#
+# == Examples
+#
+#    class { 'bind':
+#        forwarders => [ '10.0.0.1', '10.0.0.2' ],
+#    }
+#
 class bind( $forwarders = undef ) {
 	package { 'bind9':
 		ensure	=> installed,
