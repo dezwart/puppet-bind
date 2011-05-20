@@ -79,18 +79,18 @@ class bind( $forwarders = undef,
 
 		file { "/etc/bind/db.$dynamic_dns_forward_zone":
 			ensure	=> file,
-			owner	=> root,
+			owner	=> bind,
 			group	=> bind,
-			mode	=> '0660',
+			mode	=> '0644',
 			require	=> Package['bind9'],
 			notify	=> Service['bind9'],
 		}
 
 		file { "/etc/bind/db.$dynamic_dns_reverse_zone":
 			ensure	=> file,
-			owner	=> root,
+			owner	=> bind,
 			group	=> bind,
-			mode	=> '0660',
+			mode	=> '0644',
 			require	=> Package['bind9'],
 			notify	=> Service['bind9'],
 		}
