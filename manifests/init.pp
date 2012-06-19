@@ -27,72 +27,65 @@ class bind( $forwarders = undef,
         $dynamic_dns_key = undef,
         $dynamic_dns_forward_zone = undef,
         $dynamic_dns_reverse_zone = undef ) {
-    package { 'bind9':
+
+    $package = 'bind9'
+    $service = 'bind9'
+    $user = 'bind'
+    $group = 'bind'
+    $conf_dir = '/etc/bind'
+
+    package { $package:
         ensure  => installed,
     }
 
-    file { '/etc/bind/named.conf.options':
+    file { $conf_dir:
+        ensure  => directory,
+        owner   => root,
+        group   => $group,
+        mode    => '2774',
+        require => Package[$package],
+    }
+        
+    file { "$conf_dir/named.conf.options":
         ensure  => file,
         owner   => root,
-        group   => bind,
+        group   => $group,
         mode    => '0644',
         content => template('bind/named.conf.options.erb'),
-        require => Package['bind9'],
+        require => [Package[$package], File[$conf_dir]],
     }
 
-    service { 'bind9':
+    service { $package:
         ensure      => running,
         enable      => true,
         pattern     => '/usr/sbin/named',
         restart     => '/etc/init.d/bind9 reload',
-        require     => Package['bind9'],
+        require     => Package[$package],
         subscribe   => File['/etc/bind/named.conf.options'],
     }
 
-    if $dynamic_dns_key {
-        file { '/etc/bind':
-            ensure  => directory,
-            owner   => root,
-            group   => bind,
-            mode    => '2774',
-        }
-            
-        file { '/etc/bind/dynamic-dns.key':
+    if $dynamic_dns_key and $dynamic_dns_forward_zone and $dynamic_dns_reverse_zone {
+        file { "$conf_dir/dynamic-dns.key":
             ensure  => file,
             owner   => root,
-            group   => bind,
+            group   => $group,
             mode    => '0640',
             content => template('bind/dynamic-dns.key.erb'),
-            require => Package['bind9'],
-            notify  => Service['bind9'],
+            require => [Package[$package], File[$conf_dir]],
+            notify  => Service[$service],
         }
 
-        file { '/etc/bind/named.conf.local':
+        file { "$conf_dir/named.conf.local":
             ensure  => file,
             owner   => root,
-            group   => bind,
+            group   => $group,
             mode    => '0640',
             content => template('bind/named.conf.local.erb'),
-            require => Package['bind9'],
-            notify  => Service['bind9'],
+            require => [Package[$package], File[$conf_dir]],
+            notify  => Service[$service],
         }
 
-        file { "/etc/bind/db.$dynamic_dns_forward_zone":
-            ensure  => file,
-            owner   => bind,
-            group   => bind,
-            mode    => '0644',
-            require => Package['bind9'],
-            notify  => Service['bind9'],
-        }
-
-        file { "/etc/bind/db.$dynamic_dns_reverse_zone":
-            ensure  => file,
-            owner   => bind,
-            group   => bind,
-            mode    => '0644',
-            require => Package['bind9'],
-            notify  => Service['bind9'],
+        zone_file { [$dynamic_dns_forward_zone, $dynamic_dns_reverse_zone]:
         }
     }
 }

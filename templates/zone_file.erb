@@ -1,0 +1,10 @@
+$TTL    <%= ttl %>
+@   IN  SOA <%= mname %>. <%= rname %>.<%= mname %>. (
+    <%= serial %>; Serial
+    <%= refresh %>; Refresh
+    <%= _retry %>; Retry
+    <%= expire %>; Expire
+    <%= minimum %>; Minimum TTL
+);
+
+@   IN  NS  <%= mname %>.
