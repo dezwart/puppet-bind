@@ -6,15 +6,6 @@
 #   Specify one or more recursive forwarders as IP addresses in dotted quad
 #   format.
 #
-# [*dynamic_dns_key*]
-#   hmac-md5 key used for dynamic DNS updates. Default is unset.
-#
-# [*dynamic_dns_forward_zone*]
-#   Forward DNS zone for dynamic updates. The zone file contents are unmanaged.
-#
-# [*dynamic_dns_reverse_zone*]
-#   Reverse DNS zone for dynamic updates. The zone file contents are unmanaged.
-#
 # == Variables
 #
 # == Examples
@@ -23,11 +14,7 @@
 #        forwarders => [ '10.0.0.1', '10.0.0.2' ],
 #    }
 #
-class bind( $forwarders = undef,
-        $dynamic_dns_key = undef,
-        $dynamic_dns_forward_zone = undef,
-        $dynamic_dns_reverse_zone = undef ) {
-
+class bind( $forwarders = undef ) {
     $package = 'bind9'
     $service = 'bind9'
     $user = 'bind'
@@ -64,28 +51,46 @@ class bind( $forwarders = undef,
         subscribe   => File['/etc/bind/named.conf.options'],
     }
 
-    if $dynamic_dns_key and $dynamic_dns_forward_zone and $dynamic_dns_reverse_zone {
-        file { "$conf_dir/dynamic-dns.key":
-            ensure  => file,
-            owner   => root,
-            group   => $group,
-            mode    => '0640',
-            content => template('bind/dynamic-dns.key.erb'),
-            require => [Package[$package], File[$conf_dir]],
-            notify  => Service[$service],
-        }
+    # named.conf.local file fragments pattern, purges unmanaged files
+    $named_conf_local = "$conf_dir/named.conf.local"
+    $named_conf_local_file_fragments_directory = "${named_conf_local}.d"
 
-        file { "$conf_dir/named.conf.local":
-            ensure  => file,
-            owner   => root,
-            group   => $group,
-            mode    => '0640',
-            content => template('bind/named.conf.local.erb'),
-            require => [Package[$package], File[$conf_dir]],
-            notify  => Service[$service],
-        }
+    file { $named_conf_local:
+        ensure  => file,
+        owner   => root,
+        group   => $group,
+        mode    => '0640',
+        require => Package[$package],
+        notify  => Service[$service],
+    }
 
-        zone_file { [$dynamic_dns_forward_zone, $dynamic_dns_reverse_zone]:
-        }
+    file { $named_conf_local_file_fragments_directory:
+        ensure  => directory,
+        owner   => root,
+        group   => $group,
+        mode    => '0700',
+        require => Package[$package],
+        recurse => true,
+        purge   => true,
+        notify  => Exec['named_conf_local_file_assemble'],
+    }
+
+    exec { 'named_conf_local_file_assemble':
+        refreshonly => true,
+        require     => [ File[$named_conf_local_file_fragments_directory], File[$named_conf_local] ],
+        notify      => Service[$service],
+        command     => "/bin/cat ${named_conf_local_file_fragments_directory}/*_named.conf.local_* > ${named_conf_local}",
+    }
+
+    $named_conf_local_preamble = "${named_conf_local_file_fragments_directory}/00_named.conf.local_preamble"
+
+    file { $named_conf_local_preamble:
+        ensure  => file,
+        owner   => root,
+        group   => $group,
+        mode    => '0600',
+        require => Package[$package],
+        content => template("bind/named.conf.local_preamble.erb"),
+        notify  => Exec['named_conf_local_file_assemble'],
     }
 }
