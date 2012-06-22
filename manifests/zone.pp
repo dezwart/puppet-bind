@@ -45,7 +45,8 @@ define bind::zone($mname = $fqdn,
         $_retry = 3600,
         $expire = 86400,
         $minimum = 3600,
-        $ttl = 86400 ) {
+        $ttl = 86400,
+        $records = undef ) {
 
     file { "$bind::conf_dir/db.$name":
         ensure  => file,
@@ -53,7 +54,6 @@ define bind::zone($mname = $fqdn,
         group   => $bind::group,
         mode    => '0644',
         content => template('bind/zone_file.erb'),
-        replace => false,
         require => [Package[$bind::package], File[$bind::conf_dir]],
         notify  => Service[$bind::service],
     }
@@ -64,7 +64,6 @@ define bind::zone($mname = $fqdn,
         group   => $bind::group,
         mode    => '0644',
         content => template('bind/named.conf.local_zone_fragment.erb'),
-        replace => false,
         require => File[$bind::named_conf_local_file_fragments_directory],
         notify  => Exec[$bind::named_conf_local_file_assemble],
     }
