@@ -8,3 +8,5 @@ $TTL    <%= ttl %>
 );
 
 @   IN  NS  <%= mname %>.
+<% if @records %><%records.each do |record| %>
+<%= record %><% end %><% end %>
