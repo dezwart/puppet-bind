@@ -69,13 +69,14 @@ class bind( $forwarders = undef ) {
         owner   => root,
         group   => $group,
         mode    => '0700',
-        require => Package[$package],
+        require => [Package[$package], File[$conf_dir]],
         recurse => true,
         purge   => true,
         notify  => Exec['named_conf_local_file_assemble'],
     }
 
-    exec { 'named_conf_local_file_assemble':
+    $named_conf_local_file_assemble = 'named_conf_local_file_assemble'
+    exec { $named_conf_local_file_assemble:
         refreshonly => true,
         require     => [ File[$named_conf_local_file_fragments_directory], File[$named_conf_local] ],
         notify      => Service[$service],
