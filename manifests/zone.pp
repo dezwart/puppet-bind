@@ -1,6 +1,7 @@
-# Bind DNS Server - Zone file type
+# Bind DNS Server - Zone type
 #
 # Parameter names lifted from http://tools.ietf.org/html/rfc1035
+#
 # == Parameters
 #
 # [*mname*]
@@ -37,25 +38,33 @@
 #    bind::zone_file { 'foo.com':
 #    }
 #
-define bind::zone_file($mname = $fqdn,
+define bind::zone($mname = $fqdn,
         $rname = 'admin',
         $serial = 1,
         $refresh = 86400,
         $_retry = 3600,
         $expire = 86400,
         $minimum = 3600,
-        $ttl = 86400 ) {
+        $ttl = 86400,
+        $records = undef ) {
 
-    $zone = $name
-
-    file { "$bind::conf_dir/db.$zone":
+    file { "$bind::conf_dir/db.$name":
         ensure  => file,
         owner   => $bind::user,
         group   => $bind::group,
         mode    => '0644',
         content => template('bind/zone_file.erb'),
-        replace => false,
         require => [Package[$bind::package], File[$bind::conf_dir]],
         notify  => Service[$bind::service],
+    }
+
+    file { "$bind::named_conf_local_file_fragments_directory/01_named.conf.local_zone_fragment_$name":
+        ensure  => file,
+        owner   => root,
+        group   => $bind::group,
+        mode    => '0644',
+        content => template('bind/named.conf.local_zone_fragment.erb'),
+        require => File[$bind::named_conf_local_file_fragments_directory],
+        notify  => Exec[$bind::named_conf_local_file_assemble],
     }
 }
