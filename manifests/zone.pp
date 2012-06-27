@@ -16,8 +16,8 @@
 # [*refresh*]
 #   A 32 bit time interval before the zone should be refreshed.
 #
-# [*_retry*]
-#   A 32 bit time interval that should elapse before a failed refresh should be retried. Has a '_' to avoid ERB reserved word.
+# [*failed_refresh_retry*]
+#   A 32 bit time interval that should elapse before a failed refresh should be retried.
 #
 # [*expire*]
 #    A 32 bit time value that specifies the upper limit on the time interval that can elapse before the zone is no longer authoritative.
@@ -42,7 +42,7 @@ define bind::zone($mname = $fqdn,
         $rname = 'admin',
         $serial = 1,
         $refresh = 86400,
-        $_retry = 3600,
+        $failed_refresh_retry = 3600,
         $expire = 86400,
         $minimum = 3600,
         $ttl = 86400,
