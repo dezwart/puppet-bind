@@ -5,7 +5,7 @@ zone "<%= name %>" IN {
     type <%= mode %>;
     file "/etc/bind/db.<%= name %>";
     <% if mode == 'slave' -%>
-      master { transfer-servers; };
+      master { master-servers; };
       allow-transfer { transfer-servers; };
     <% end -%>
 };
