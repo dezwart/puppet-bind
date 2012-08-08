@@ -46,7 +46,8 @@ define bind::zone($mname = $fqdn,
         $expire = 86400,
         $minimum = 3600,
         $ttl = 86400,
-        $records = undef ) {
+        $records = undef,
+        $mode = 'master' ) {
 
     file { "$bind::conf_dir/db.$name":
         ensure  => file,
