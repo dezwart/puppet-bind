@@ -58,7 +58,7 @@ define bind::zone($mname = $fqdn,
         notify  => Service[$bind::service],
     }
 
-    file { "$bind::named_conf_local_file_fragments_directory/01_named.conf.local_zone_fragment_$name":
+    file { "$bind::named_conf_local_file_fragments_directory/10_named.conf.local_zone_fragment_$name":
         ensure  => file,
         owner   => root,
         group   => $bind::group,
