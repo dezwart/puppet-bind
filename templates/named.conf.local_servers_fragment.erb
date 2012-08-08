@@ -1,7 +1,10 @@
 
-server 'transfer-servers' {
-    keys {
-      TRANSFER;
-    };
+<% if @transfer_servers %>
+<%transfer_servers.each do |server| %><%= server %>;<% end %>
+server <% server %> {
+  keys {
+    TRANSFER;
+  };
 };
+<% end -%>
 
