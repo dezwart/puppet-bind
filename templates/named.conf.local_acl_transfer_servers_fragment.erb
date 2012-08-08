@@ -1,0 +1,7 @@
+
+<% if @transfer_servers %>
+acl 'transfer-servers' {
+  <%transfer_servers.each do |server| %><%= server %>;<% end %>
+}
+<% end -%>
+

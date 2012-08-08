@@ -18,7 +18,8 @@ class bind( $forwarders = undef,
             $key_name = undef,
             $key_algorithm = undef,
             $key_secret = undef,
-            ) {
+            $transfer_servers = undef,
+          ) {
     $package = 'bind9'
     $service = 'bind9'
     $user = 'bind'
@@ -99,6 +100,16 @@ class bind( $forwarders = undef,
         notify  => Exec['named_conf_local_file_assemble'],
     }
 
+    file { "$bind::named_conf_local_file_fragments_directory/01_named.conf.local_acl_transfer_servers_fragment_$name":
+        ensure => file,
+        owner => root,
+        group => $bind::group,
+        mode => '0644',
+        content => template('bind/named.conf.local_acl_transfer_servers_fragment.erb'),
+        require => File[$bind::named_conf_local_file_fragments_directory],
+        notify => Exec[$bind::named_conf_local_file_assemble],
+    }
+
     if $key_name and $key_algorithm and $key_secret {
         file { "$bind::named_conf_local_file_fragments_directory/03_named.conf.local_key_fragment_$name":
             ensure => file,
@@ -111,3 +122,4 @@ class bind( $forwarders = undef,
         }
     }
 }
+
