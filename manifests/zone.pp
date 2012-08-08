@@ -49,16 +49,18 @@ define bind::zone($mname = $fqdn,
         $records = undef,
         $mode = 'master' ) {
 
-    file { "$bind::conf_dir/db.$name":
-        ensure  => file,
-        owner   => $bind::user,
-        group   => $bind::group,
-        mode    => '0644',
-        content => template('bind/zone_file.erb'),
-        require => [Package[$bind::package], File[$bind::conf_dir]],
-        notify  => Service[$bind::service],
+    if $mode == 'master' {
+        file { "$bind::conf_dir/db.$name":
+            ensure  => file,
+            owner   => $bind::user,
+            group   => $bind::group,
+            mode    => '0644',
+            content => template('bind/zone_file.erb'),
+            require => [Package[$bind::package], File[$bind::conf_dir]],
+            notify  => Service[$bind::service],
+        }
     }
-
+    
     file { "$bind::named_conf_local_file_fragments_directory/10_named.conf.local_zone_fragment_$name":
         ensure  => file,
         owner   => root,
