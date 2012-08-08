@@ -2,6 +2,6 @@
 // Zone fragment for <%= name %>
 
 zone "<%= name %>" IN {
-    type master;
+type <%= mode %>;
     file "/etc/bind/db.<%= name %>";
 };
