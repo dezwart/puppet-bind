@@ -50,7 +50,7 @@ define bind::zone($mname = $fqdn,
         $mode = 'master' ) {
 
     if $mode == 'master' {
-        file { "$bind::conf_dir/db.$name":
+        file { "/var/lib/bind/db.$name":
             ensure  => file,
             owner   => $bind::user,
             group   => $bind::group,
