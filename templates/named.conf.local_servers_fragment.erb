@@ -1,10 +1,11 @@
 
 <% if @transfer_servers %>
-<%transfer_servers.each do |serverip| %>
+<% transfer_servers.each do |serverip| %>
 server <%= serverip %> {
   keys {
     TRANSFER;
   };
 };
+<% end -%>
 <% end -%>
 
