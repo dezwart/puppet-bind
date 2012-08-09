@@ -18,6 +18,11 @@ options {
         <%= forwarder %>;
 <% end %>   };<% end %>
 
+    <% if allow_query != :undef -%>
+    allow-query {
+      <% allow_query.each do |range| %><%=  range %>;<% end %>
+    };
+
     auth-nxdomain no;    # conform to RFC1035
     listen-on-v6 { any; };
     dnssec-enable yes;    

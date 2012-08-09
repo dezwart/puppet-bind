@@ -20,6 +20,7 @@ class bind( $forwarders = undef,
             $key_secret = undef,
             $transfer_servers = undef,
             $mode = 'master',
+            $allow_query = undef,
           ) {
     $package = 'bind9'
     $service = 'bind9'
