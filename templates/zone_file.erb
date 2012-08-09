@@ -7,6 +7,5 @@ $TTL    <%= ttl %>
     <%= minimum %>; Minimum TTL
 );
 
-@   IN  NS  <%= mname %>.
 <% if @records %><%records.each do |record| %>
 <%= record %><% end %><% end %>
