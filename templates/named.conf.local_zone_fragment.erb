@@ -6,6 +6,5 @@ zone "<%= name %>" IN {
     file "/var/lib/bind/db.<%= name %>";
     <% if mode == 'slave' -%>
       masters { <%= masters %>; };
-      allow-transfer { transfer-servers; };
     <% end -%>
 };
