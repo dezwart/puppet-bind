@@ -5,7 +5,7 @@
 #       secret => '',
 #    }
 #
-define bind::zone( $algorithm, $secret ) {
+define bind::key( $algorithm, $secret ) {
 
     file { "$bind::named_conf_local_file_fragments_directory/03_named.conf.local_key_fragment_$name":
         ensure  => file,
