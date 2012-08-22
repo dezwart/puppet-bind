@@ -8,7 +8,7 @@ zone "<%= name %>" IN {
     masters { <%= masters %>; };
   <% end -%>
   <%- if @allow_update -%>
-    allow-update { <%= allow_update %>; };
+    allow-update { key <%= allow_update %>; };
   <%- end %>
 };
 
