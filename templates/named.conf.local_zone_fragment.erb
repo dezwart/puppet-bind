@@ -1,6 +1,11 @@
 
 // Zone fragment for <%= name %>
-
+<%- if @forwarders -%>
+zone "<%= name %>" IN {
+  type <%= mode %>;
+  forwarders { <%= forwarders %>; };
+};
+<%- else -%>
 zone "<%= name %>" IN {
     type <%= mode %>;
     file "/var/lib/bind/db.<%= name %>";
@@ -11,4 +16,5 @@ zone "<%= name %>" IN {
     allow-update { key <%= allow_update %>; };
   <%- end %>
 };
+<%- end -%>
 
