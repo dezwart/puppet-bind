@@ -48,7 +48,8 @@ define bind::zone($mname = $fqdn,
         $ttl = 86400,
         $records = undef,
         $mode = 'master',
-        $masters = undef ) {
+        $masters = undef,
+        $allow_update = undef ) {
 
     if $mode == 'master' {
         file { "/var/lib/bind/db.$name":

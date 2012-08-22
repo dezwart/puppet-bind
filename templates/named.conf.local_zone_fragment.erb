@@ -4,7 +4,11 @@
 zone "<%= name %>" IN {
     type <%= mode %>;
     file "/var/lib/bind/db.<%= name %>";
-    <% if mode == 'slave' -%>
-      masters { <%= masters %>; };
-    <% end -%>
+  <% if mode == 'slave' -%>
+    masters { <%= masters %>; };
+  <% end -%>
+  <%- if @allow_update -%>
+    allow-update { <%= allow_update %>; };
+  <%- end %>
 };
+
