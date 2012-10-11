@@ -28,6 +28,11 @@
 # [*ttl*]
 #   SOA Resource time to live.
 #
+# [*replace*]
+#   If true, the zone file will be created if non-existent, but *never ever touched again*.
+#   Even if you update its definition in Puppet, *puppet will refuse to touch the existing file*
+#   Only applicable of mode == master
+#
 # == Variables
 #
 # [*zone*]
@@ -47,6 +52,7 @@ define bind::zone($mname = $fqdn,
         $minimum = 3600,
         $ttl = 86400,
         $records = undef,
+        $replace = undef,
         $mode = 'master',
         $masters = undef,
         $allow_update = undef,
@@ -61,6 +67,7 @@ define bind::zone($mname = $fqdn,
             content => template('bind/zone_file.erb'),
             require => [Package[$bind::package], File[$bind::conf_dir]],
             notify  => Service[$bind::service],
+            replace => $replace,
         }
     }
     
