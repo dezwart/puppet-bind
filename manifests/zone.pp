@@ -50,7 +50,9 @@ define bind::zone($mname = $fqdn,
         $mode = 'master',
         $masters = undef,
         $allow_update = undef,
-        $forwarders = undef ) {
+        $forwarders = undef,
+        $replace = true
+        ) {
 
     if $mode == 'master' {
         file { "/var/lib/bind/db.$name":
@@ -58,6 +60,7 @@ define bind::zone($mname = $fqdn,
             owner   => $bind::user,
             group   => $bind::group,
             mode    => '0644',
+            replace => $replace,
             content => template('bind/zone_file.erb'),
             require => [Package[$bind::package], File[$bind::conf_dir]],
             notify  => Service[$bind::service],
