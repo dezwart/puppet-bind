@@ -28,6 +28,11 @@
 # [*ttl*]
 #   SOA Resource time to live.
 #
+# [*replace*]
+#   If true, the zone file will be created if non-existent, but *never ever touched again*.
+#   Even if you update its definition in Puppet, *puppet will refuse to touch the existing file*
+#   Only applicable of mode == master
+#
 # == Variables
 #
 # [*zone*]
