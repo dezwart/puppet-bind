@@ -53,7 +53,7 @@ define bind::zone($mname = $::fqdn,
   $ttl = 86400,
   $records = undef ) {
 
-  file { "$bind::conf_dir/db.$name":
+  file { "${bind::conf_dir}/db.${name}":
     ensure  => file,
     owner   => $bind::user,
     group   => $bind::group,
@@ -63,7 +63,7 @@ define bind::zone($mname = $::fqdn,
     notify  => Service[$bind::service],
   }
 
-  file { "$bind::ncl_ffd/01_named.conf.local_zone_fragment_$name":
+  file { "${bind::ncl_ffd}/01_named.conf.local_zone_fragment_${name}":
     ensure  => file,
     owner   => root,
     group   => $bind::group,
@@ -74,4 +74,4 @@ define bind::zone($mname = $::fqdn,
   }
 }
 
-/* vim: set ts=2 sw=2 sts=2 tw=0 et:*/
+# vim: set ts=2 sw=2 sts=2 tw=0 et:
