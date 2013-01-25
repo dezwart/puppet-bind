@@ -33,7 +33,7 @@ class bind( $forwarders = undef ) {
     require => Package[$package],
   }
 
-  file { "$conf_dir/named.conf.options":
+  file { "${conf_dir}/named.conf.options":
     ensure  => file,
     owner   => root,
     group   => $group,
@@ -52,7 +52,7 @@ class bind( $forwarders = undef ) {
   }
 
   # named.conf.local file fragments pattern, purges unmanaged files
-  $ncl = "$conf_dir/named.conf.local"
+  $ncl = "${conf_dir}/named.conf.local"
   # File Fragements Directory
   $ncl_ffd = "${ncl}.d"
 
@@ -97,4 +97,4 @@ class bind( $forwarders = undef ) {
   }
 }
 
-/* vim: set ts=2 sw=2 sts=2 tw=0 et:*/
+# vim: set ts=2 sw=2 sts=2 tw=0 et:
