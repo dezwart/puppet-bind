@@ -5,10 +5,12 @@
 # == Parameters
 #
 # [*mname*]
-#   The <domain-name> of the name server that was the original or primary source of data for this zone.
+#   The <domain-name> of the name server that was the original or primary
+#   source of data for this zone.
 #
 # [*rname*]
-#   A <domain-name> which specifies the mailbox of the person responsible for this zone.
+#   A <domain-name> which specifies the mailbox of the person responsible
+#   for this zone.
 #
 # [*serial*]
 #   The unsigned 32 bit version number of the original copy of the zone.
@@ -17,13 +19,16 @@
 #   A 32 bit time interval before the zone should be refreshed.
 #
 # [*failed_refresh_retry*]
-#   A 32 bit time interval that should elapse before a failed refresh should be retried.
+#   A 32 bit time interval that should elapse before a failed refresh should be
+#   retried.
 #
 # [*expire*]
-#    A 32 bit time value that specifies the upper limit on the time interval that can elapse before the zone is no longer authoritative.
+#    A 32 bit time value that specifies the upper limit on the time interval
+#   that can elapse before the zone is no longer authoritative.
 #
 # [*minimum*]
-#   The unsigned 32 bit minimum TTL field that should be exported with any RR from this zone.
+#   The unsigned 32 bit minimum TTL field that should be exported with any
+#   RR from this zone.
 #
 # [*ttl*]
 #   SOA Resource time to live.
@@ -58,27 +63,28 @@ define bind::zone($mname = $fqdn,
         $forwarders = undef,
         $replace = true
         ) {
-
-    if $mode == 'master' {
-        file { "/var/lib/bind/db.$name":
-            ensure  => file,
-            owner   => $bind::user,
-            group   => $bind::group,
-            mode    => '0644',
-            replace => $replace,
-            content => template('bind/zone_file.erb'),
-            require => [Package[$bind::package], File[$bind::conf_dir]],
-            notify  => Service[$bind::service],
-        }
+  if $mode == 'master' {
+    file { "${bind::conf_dir}/db.${name}":
+      ensure  => file,
+      owner   => $bind::user,
+      group   => $bind::group,
+      mode    => '0644',
+      replace => $replace,
+      content => template('bind/zone_file.erb'),
+      require => [Package[$bind::package], File[$bind::conf_dir]],
+      notify  => Service[$bind::service],
     }
+  }
     
-    file { "$bind::named_conf_local_file_fragments_directory/10_named.conf.local_zone_fragment_$name":
-        ensure  => file,
-        owner   => root,
-        group   => $bind::group,
-        mode    => '0644',
-        content => template('bind/named.conf.local_zone_fragment.erb'),
-        require => File[$bind::named_conf_local_file_fragments_directory],
-        notify  => Exec[$bind::named_conf_local_file_assemble],
-    }
+  file { "${bind::ncl_ffd}/01_named.conf.local_zone_fragment_${name}":
+    ensure  => file,
+    owner   => root,
+    group   => $bind::group,
+    mode    => '0644',
+    content => template('bind/named.conf.local_zone_fragment.erb'),
+    require => File[$bind::ncl_ffd],
+    notify  => Exec[$bind::ncl_file_assemble],
+  }
 }
+
+# vim: set ts=2 sw=2 sts=2 tw=0 et:

@@ -19,84 +19,86 @@ class bind( $forwarders = undef,
             $mode = 'master',
             $allow_query = undef,
           ) {
-    $package = 'bind9'
-    $service = 'bind9'
-    $user = 'bind'
-    $group = 'bind'
-    $conf_dir = '/etc/bind'
+  $package = 'bind9'
+  $service = 'bind9'
+  $user = 'bind'
+  $group = 'bind'
+  $conf_dir = '/etc/bind'
 
-    package { $package:
-        ensure  => installed,
-    }
+  package { $package:
+    ensure  => installed,
+  }
 
-    file { $conf_dir:
-        ensure  => directory,
-        owner   => root,
-        group   => $group,
-        mode    => '2774',
-        require => Package[$package],
-    }
-        
-    file { "$conf_dir/named.conf.options":
-        ensure  => file,
-        owner   => root,
-        group   => $group,
-        mode    => '0644',
-        content => template('bind/named.conf.options.erb'),
-        require => [Package[$package], File[$conf_dir]],
-    }
+  file { $conf_dir:
+    ensure  => directory,
+    owner   => root,
+    group   => $group,
+    mode    => '2774',
+    require => Package[$package],
+  }
 
-    service { $package:
-        ensure      => running,
-        enable      => true,
-        pattern     => '/usr/sbin/named',
-        restart     => '/etc/init.d/bind9 reload',
-        require     => Package[$package],
-        subscribe   => File['/etc/bind/named.conf.options'],
-    }
+  file { "${conf_dir}/named.conf.options":
+    ensure  => file,
+    owner   => root,
+    group   => $group,
+    mode    => '0644',
+    content => template('bind/named.conf.options.erb'),
+    require => [Package[$package], File[$conf_dir]],
+  }
 
-    # named.conf.local file fragments pattern, purges unmanaged files
-    $named_conf_local = "$conf_dir/named.conf.local"
-    $named_conf_local_file_fragments_directory = "${named_conf_local}.d"
+  service { $package:
+    ensure    => running,
+    enable    => true,
+    pattern   => '/usr/sbin/named',
+    restart   => '/etc/init.d/bind9 reload',
+    require   => Package[$package],
+    subscribe => File['/etc/bind/named.conf.options'],
+  }
 
-    file { $named_conf_local:
-        ensure  => file,
-        owner   => root,
-        group   => $group,
-        mode    => '0640',
-        require => Package[$package],
-        notify  => Service[$service],
-    }
+  # named.conf.local file fragments pattern, purges unmanaged files
+  $ncl = "${conf_dir}/named.conf.local"
+  # File Fragements Directory
+  $ncl_ffd = "${ncl}.d"
 
-    file { $named_conf_local_file_fragments_directory:
-        ensure  => directory,
-        owner   => root,
-        group   => $group,
-        mode    => '0700',
-        require => [Package[$package], File[$conf_dir]],
-        recurse => true,
-        purge   => true,
-        notify  => Exec['named_conf_local_file_assemble'],
-    }
+  file { $ncl:
+    ensure  => file,
+    owner   => root,
+    group   => $group,
+    mode    => '0640',
+    require => [Package[$package], File[$conf_dir]],
+    notify  => Service[$service],
+  }
 
-    $named_conf_local_file_assemble = 'named_conf_local_file_assemble'
-    exec { $named_conf_local_file_assemble:
-        refreshonly => true,
-        require     => [ File[$named_conf_local_file_fragments_directory], File[$named_conf_local] ],
-        notify      => Service[$service],
-        command     => "/bin/cat ${named_conf_local_file_fragments_directory}/*_named.conf.local_* > ${named_conf_local}",
-    }
+  file { $ncl_ffd:
+    ensure  => directory,
+    owner   => root,
+    group   => $group,
+    mode    => '0700',
+    require => [Package[$package], File[$ncl]],
+    recurse => true,
+    purge   => true,
+    notify  => Exec['ncl_file_assemble'],
+  }
 
-    $named_conf_local_preamble = "${named_conf_local_file_fragments_directory}/00_named.conf.local_preamble"
+  $ncl_file_assemble = 'ncl_file_assemble'
+  exec { $ncl_file_assemble:
+    refreshonly => true,
+    require     => File[$ncl_ffd],
+    notify      => Service[$service],
+    command     => "/bin/cat ${ncl_ffd}/*_named.conf.local_* > ${ncl}",
+  }
 
-    file { $named_conf_local_preamble:
-        ensure  => file,
-        owner   => root,
-        group   => $group,
-        mode    => '0600',
-        require => Package[$package],
-        content => template("bind/named.conf.local_preamble.erb"),
-        notify  => Exec['named_conf_local_file_assemble'],
-    }
+  $ncl_preamble = "${ncl_ffd}/00_named.conf.local_preamble"
+
+  file { $ncl_preamble:
+    ensure  => file,
+    owner   => root,
+    group   => $group,
+    mode    => '0600',
+    require => Package[$package],
+    content => template('bind/named.conf.local_preamble.erb'),
+    notify  => Exec['ncl_file_assemble'],
+  }
 }
 
+# vim: set ts=2 sw=2 sts=2 tw=0 et:
