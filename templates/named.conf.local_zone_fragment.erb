@@ -1,7 +1,20 @@
 
 // Zone fragment for <%= name %>
-
+<%- if @forwarders -%>
 zone "<%= name %>" IN {
-    type master;
-    file "/etc/bind/db.<%= name %>";
+  type <%= mode %>;
+  forwarders { <%= forwarders %>; };
 };
+<%- else -%>
+zone "<%= name %>" IN {
+    type <%= mode %>;
+    file "/var/lib/bind/db.<%= name %>";
+  <% if mode == 'slave' -%>
+    masters { <%= masters %>; };
+  <% end -%>
+  <%- if @allow_update -%>
+    allow-update { key <%= allow_update %>; };
+  <%- end %>
+};
+<%- end -%>
+

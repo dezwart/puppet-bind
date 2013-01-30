@@ -14,7 +14,11 @@
 #        forwarders => [ '10.0.0.1', '10.0.0.2' ],
 #    }
 #
-class bind( $forwarders = undef ) {
+class bind( $forwarders = undef,
+            $transfer_servers = undef,
+            $mode = 'master',
+            $allow_query = undef,
+          ) {
   $package = 'bind9'
   $service = 'bind9'
   $user = 'bind'
