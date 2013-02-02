@@ -33,6 +33,11 @@
 # [*ttl*]
 #   SOA Resource time to live.
 #
+# [*replace*]
+#   If true, the zone file will be created if non-existent, but *never ever touched again*.
+#   Even if you update its definition in Puppet, *puppet will refuse to touch the existing file*
+#   Only applicable of mode == master
+#
 # == Variables
 #
 # [*zone*]
@@ -43,26 +48,34 @@
 #    bind::zone_file { 'foo.com':
 #    }
 #
-define bind::zone($mname = $::fqdn,
-  $rname = 'admin',
-  $serial = 1,
-  $refresh = 86400,
-  $failed_refresh_retry = 3600,
-  $expire = 86400,
-  $minimum = 3600,
-  $ttl = 86400,
-  $records = undef ) {
-
-  file { "${bind::conf_dir}/db.${name}":
-    ensure  => file,
-    owner   => $bind::user,
-    group   => $bind::group,
-    mode    => '0644',
-    content => template('bind/zone_file.erb'),
-    require => [Package[$bind::package], File[$bind::conf_dir]],
-    notify  => Service[$bind::service],
+define bind::zone($mname = $fqdn,
+        $rname = 'admin',
+        $serial = 1,
+        $refresh = 86400,
+        $failed_refresh_retry = 3600,
+        $expire = 86400,
+        $minimum = 3600,
+        $ttl = 86400,
+        $records = undef,
+        $mode = 'master',
+        $masters = undef,
+        $allow_update = undef,
+        $forwarders = undef,
+        $replace = true
+        ) {
+  if $mode == 'master' {
+    file { "${bind::conf_dir}/db.${name}":
+      ensure  => file,
+      owner   => $bind::user,
+      group   => $bind::group,
+      mode    => '0644',
+      replace => $replace,
+      content => template('bind/zone_file.erb'),
+      require => [Package[$bind::package], File[$bind::conf_dir]],
+      notify  => Service[$bind::service],
+    }
   }
-
+    
   file { "${bind::ncl_ffd}/01_named.conf.local_zone_fragment_${name}":
     ensure  => file,
     owner   => root,
