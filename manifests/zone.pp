@@ -23,7 +23,7 @@
 #   retried.
 #
 # [*expire*]
-#    A 32 bit time value that specifies the upper limit on the time interval
+#  A 32 bit time value that specifies the upper limit on the time interval
 #   that can elapse before the zone is no longer authoritative.
 #
 # [*minimum*]
@@ -34,9 +34,9 @@
 #   SOA Resource time to live.
 #
 # [*replace*]
-#   If true, the zone file will be created if non-existent, but *never ever touched again*.
-#   Even if you update its definition in Puppet, *puppet will refuse to touch the existing file*
-#   Only applicable of mode == master
+#   If true, the zone file will be created if non-existent, but *never ever
+#   touched again*. Even if you update its definition in Puppet, *puppet will
+#   refuse to touch the existing file* Only applicable of mode == master
 #
 # == Variables
 #
@@ -45,24 +45,24 @@
 #
 # == Examples
 #
-#    bind::zone_file { 'foo.com':
-#    }
+#  bind::zone_file { 'foo.com':
+#  }
 #
 define bind::zone($mname = $fqdn,
-        $rname = 'admin',
-        $serial = 1,
-        $refresh = 86400,
-        $failed_refresh_retry = 3600,
-        $expire = 86400,
-        $minimum = 3600,
-        $ttl = 86400,
-        $records = undef,
-        $mode = 'master',
-        $masters = undef,
-        $allow_update = undef,
-        $forwarders = undef,
-        $replace = true
-        ) {
+    $rname = 'admin',
+    $serial = 1,
+    $refresh = 86400,
+    $failed_refresh_retry = 3600,
+    $expire = 86400,
+    $minimum = 3600,
+    $ttl = 86400,
+    $records = undef,
+    $mode = 'master',
+    $masters = undef,
+    $allow_update = undef,
+    $forwarders = undef,
+    $replace = true
+) {
   if $mode == 'master' {
     file { "${bind::zone_dir}/db.${name}":
       ensure  => file,
