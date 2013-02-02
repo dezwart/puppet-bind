@@ -64,18 +64,18 @@ define bind::zone($mname = $fqdn,
         $replace = true
         ) {
   if $mode == 'master' {
-    file { "${bind::conf_dir}/db.${name}":
+    file { "${bind::zone_dir}/db.${name}":
       ensure  => file,
       owner   => $bind::user,
       group   => $bind::group,
       mode    => '0644',
       replace => $replace,
       content => template('bind/zone_file.erb'),
-      require => [Package[$bind::package], File[$bind::conf_dir]],
+      require => [Package[$bind::package], File[$bind::zone_dir]],
       notify  => Service[$bind::service],
     }
   }
-    
+
   file { "${bind::ncl_ffd}/01_named.conf.local_zone_fragment_${name}":
     ensure  => file,
     owner   => root,

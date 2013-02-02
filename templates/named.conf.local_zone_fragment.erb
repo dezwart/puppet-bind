@@ -8,7 +8,7 @@ zone "<%= name %>" IN {
 <%- else -%>
 zone "<%= name %>" IN {
     type <%= mode %>;
-    file "/var/lib/bind/db.<%= name %>";
+    file "<%= scope.lookupvar('bind::zone_dir') %>/db.<%= name %>";
   <% if mode == 'slave' -%>
     masters { <%= masters %>; };
   <% end -%>

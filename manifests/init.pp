@@ -24,6 +24,7 @@ class bind( $forwarders = undef,
   $user = 'bind'
   $group = 'bind'
   $conf_dir = '/etc/bind'
+  $zone_dir = '/var/lib/bind'
 
   package { $package:
     ensure  => installed,
@@ -34,6 +35,14 @@ class bind( $forwarders = undef,
     owner   => root,
     group   => $group,
     mode    => '2774',
+    require => Package[$package],
+  }
+
+  file { $zone_dir:
+    ensure  => directory,
+    owner   => root,
+    group   => $group,
+    mode    => '0774',
     require => Package[$package],
   }
 
