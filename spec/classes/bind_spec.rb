@@ -1,58 +1,46 @@
 require 'spec_helper'
+require 'Bind'
 
 describe 'bind' do
-  cn = 'bind'
-  package = "#{cn}9"
-  service = package
-  user = cn
-  group = cn
-  conf_dir = "/etc/#{cn}"
-  zone_dir = "/var/lib/#{cn}"
-  nco = "#{conf_dir}/named.conf.options"
-  ncl = "#{conf_dir}/named.conf.local"
-  ncl_ffd = "#{ncl}.d"
-  ncl_file_assemble = 'ncl_file_assemble'
-  ncl_preamble = "#{ncl_ffd}/00_named.conf.local_preamble"
-
   context 'default' do
     it {
-      should contain_package(package)
+      should contain_package(Bind::PACKAGE)
     }
 
     it {
-      should contain_service(service)
+      should contain_service(Bind::SERVICE)
     }
 
     it {
-      should contain_file(conf_dir).with({
+      should contain_file(Bind::CONF_DIR).with({
         'ensure' => 'directory',
       })
 
-      should contain_file(zone_dir).with({
+      should contain_file(Bind::ZONE_DIR).with({
         'ensure' => 'directory',
       })
     }
 
     it {
-      should contain_file(nco).with({
+      should contain_file(Bind::NCO).with({
         'ensure' => 'file',
       })
     }
 
     it {
-      should contain_file(ncl).with({
+      should contain_file(Bind::NCL).with({
         'ensure' => 'file',
       })
 
-      should contain_file(ncl_ffd).with({
+      should contain_file(Bind::NCL_FFD).with({
         'ensure' => 'directory',
       })
 
-      should contain_file(ncl_preamble).with({
+      should contain_file(Bind::NCL_PREAMBLE).with({
         'ensure' => 'file',
       })
 
-      should contain_exec(ncl_file_assemble)
+      should contain_exec(Bind::NCL_FILE_ASSEMBLE)
     }
   end
 end
