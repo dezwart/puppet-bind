@@ -18,13 +18,7 @@ class bind( $forwarders = undef,
             $transfer_servers = undef,
             $mode = 'master',
             $allow_query = undef,
-          ) {
-  $package = 'bind9'
-  $service = 'bind9'
-  $user = 'bind'
-  $group = 'bind'
-  $conf_dir = '/etc/bind'
-  $zone_dir = '/var/lib/bind'
+          ) inherits bind::params {
 
   package { $package:
     ensure  => installed,
@@ -65,9 +59,6 @@ class bind( $forwarders = undef,
   }
 
   # named.conf.local file fragments pattern, purges unmanaged files
-  $ncl = "${conf_dir}/named.conf.local"
-  # File Fragements Directory
-  $ncl_ffd = "${ncl}.d"
 
   file { $ncl:
     ensure  => file,
@@ -89,15 +80,12 @@ class bind( $forwarders = undef,
     notify  => Exec['ncl_file_assemble'],
   }
 
-  $ncl_file_assemble = 'ncl_file_assemble'
   exec { $ncl_file_assemble:
     refreshonly => true,
     require     => File[$ncl_ffd],
     notify      => Service[$service],
     command     => "/bin/cat ${ncl_ffd}/*_named.conf.local_* > ${ncl}",
   }
-
-  $ncl_preamble = "${ncl_ffd}/00_named.conf.local_preamble"
 
   file { $ncl_preamble:
     ensure  => file,
