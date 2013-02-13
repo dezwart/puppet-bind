@@ -4,8 +4,8 @@ class bind::params {
   $cn = 'bind'
   $package = "${cn}9"
   $service = "${cn}9"
-  $user = "${cn}"
-  $group = "${cn}"
+  $user = $cn
+  $group = $cn
   $conf_dir = "/etc/${cn}"
   $zone_dir = "/var/lib/${cn}"
   $ncl = "${conf_dir}/named.conf.local"

@@ -6,7 +6,7 @@
 #  }
 #
 define bind::key( $algorithm, $secret ) {
-  require bind::params
+  require bind
 
   file { "${bind::params::ncl_ffd}/03_named.conf.local_key_fragment_${name}":
     ensure  => file,
