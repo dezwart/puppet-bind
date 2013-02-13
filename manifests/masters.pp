@@ -5,7 +5,9 @@
 #  }
 #
 define bind::masters( $addresses ) {
-  file { "${bind::ncl_ffd}/02_named.conf.local_masters_fragment_${name}":
+  require bind::params
+
+  file { "${bind::params::ncl_ffd}/02_named.conf.local_masters_fragment_${name}":
     ensure  => file,
     owner   => root,
     group   => $bind::group,
