@@ -9,7 +9,7 @@ define bind::masters( $addresses ) {
 
   $fragment_pfx = '02_named.conf.local_masters_fragment_'
 
-  file { "${bind::params::ncl_ffd}/${fragment_pfx}${name}":
+  file { "${bind::ncl_ffd}/${fragment_pfx}${name}":
     ensure  => file,
     owner   => root,
     group   => $bind::group,

@@ -5,6 +5,8 @@
 #  }
 #
 define bind::server( $key = undef ) {
+  require bind
+
   file { "${bind::ncl_ffd}/04_named.conf.local_servers_fragment_${name}":
     ensure  => file,
     owner   => root,

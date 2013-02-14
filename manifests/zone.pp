@@ -63,6 +63,8 @@ define bind::zone($mname = $fqdn,
     $forwarders = undef,
     $replace = true
 ) {
+  require bind
+
   if $mode == 'master' {
     file { "${bind::zone_dir}/db.${name}":
       ensure  => file,

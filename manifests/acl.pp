@@ -6,7 +6,7 @@
 define bind::acl( $addresses ) {
   require bind
 
-  file { "${bind::params::ncl_ffd}/01_named.conf.local_acl_fragment_${name}":
+  file { "${bind::ncl_ffd}/01_named.conf.local_acl_fragment_${name}":
     ensure  => file,
     owner   => root,
     group   => $bind::group,
