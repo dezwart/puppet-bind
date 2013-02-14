@@ -5,18 +5,18 @@
 #  }
 #
 define bind::masters( $addresses ) {
-  require bind
+  require bind::params
 
   $fragment_pfx = '02_named.conf.local_masters_fragment_'
 
-  file { "${bind::ncl_ffd}/${fragment_pfx}${name}":
+  file { "${bind::params::ncl_ffd}/${fragment_pfx}${name}":
     ensure  => file,
     owner   => root,
-    group   => $bind::group,
+    group   => $bind::params::group,
     mode    => '0644',
     content => template('bind/named.conf.local_masters_fragment.erb'),
-    require => File[$bind::ncl_ffd],
-    notify  => Exec[$bind::ncl_file_assemble],
+    require => File[$bind::params::ncl_ffd],
+    notify  => Exec[$bind::params::ncl_file_assemble],
   }
 }
 

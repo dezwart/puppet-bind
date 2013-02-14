@@ -48,7 +48,7 @@
 #  bind::zone_file { 'foo.com':
 #  }
 #
-define bind::zone($mname = $fqdn,
+define bind::zone($mname = $::fqdn,
     $rname = 'admin',
     $serial = 1,
     $refresh = 86400,
@@ -63,29 +63,32 @@ define bind::zone($mname = $fqdn,
     $forwarders = undef,
     $replace = true
 ) {
-  require bind
+  require bind::params
 
   if $mode == 'master' {
-    file { "${bind::zone_dir}/db.${name}":
+    file { "${bind::params::zone_dir}/db.${name}":
       ensure  => file,
-      owner   => $bind::user,
-      group   => $bind::group,
+      owner   => $bind::params::user,
+      group   => $bind::params::group,
       mode    => '0644',
       replace => $replace,
       content => template('bind/zone_file.erb'),
-      require => [Package[$bind::package], File[$bind::zone_dir]],
-      notify  => Service[$bind::service],
+      require => [
+        Package[$bind::params::package],
+        File[$bind::params::zone_dir]
+      ],
+      notify  => Service[$bind::params::service],
     }
   }
 
-  file { "${bind::ncl_ffd}/01_named.conf.local_zone_fragment_${name}":
+  file { "${bind::params::ncl_ffd}/01_named.conf.local_zone_fragment_${name}":
     ensure  => file,
     owner   => root,
-    group   => $bind::group,
+    group   => $bind::params::group,
     mode    => '0644',
     content => template('bind/named.conf.local_zone_fragment.erb'),
-    require => File[$bind::ncl_ffd],
-    notify  => Exec[$bind::ncl_file_assemble],
+    require => File[$bind::params::ncl_ffd],
+    notify  => Exec[$bind::params::ncl_file_assemble],
   }
 }
 
