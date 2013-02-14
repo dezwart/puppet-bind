@@ -5,14 +5,18 @@
 #  }
 #
 define bind::server( $key = undef ) {
-  file { "${bind::ncl_ffd}/04_named.conf.local_servers_fragment_${name}":
+  require bind::params
+
+  $fragment_pfx = '04_named.conf.local_servers_fragment_'
+
+  file { "${bind::params::ncl_ffd}/${fragment_pfx}${name}":
     ensure  => file,
     owner   => root,
-    group   => $bind::group,
+    group   => $bind::params::group,
     mode    => '0644',
     content => template('bind/named.conf.local_servers_fragment.erb'),
-    require => File[$bind::ncl_ffd],
-    notify  => Exec[$bind::ncl_file_assemble],
+    require => File[$bind::params::ncl_ffd],
+    notify  => Exec[$bind::params::ncl_file_assemble],
   }
 }
 
