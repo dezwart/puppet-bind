@@ -19,92 +19,81 @@ class bind( $forwarders = undef,
             $mode = 'master',
             $allow_query = undef,
           ) {
-  $package = 'bind9'
-  $service = 'bind9'
-  $user = 'bind'
-  $group = 'bind'
-  $conf_dir = '/etc/bind'
-  $zone_dir = '/var/lib/bind'
+  include bind::params
 
-  package { $package:
+  package { $bind::params::package:
     ensure  => installed,
   }
 
-  file { $conf_dir:
+  file { $bind::params::conf_dir:
     ensure  => directory,
     owner   => root,
-    group   => $group,
+    group   => $bind::params::group,
     mode    => '2774',
-    require => Package[$package],
+    require => Package[$bind::params::package],
   }
 
-  file { $zone_dir:
+  file { $bind::params::zone_dir:
     ensure  => directory,
     owner   => root,
-    group   => $group,
+    group   => $bind::params::group,
     mode    => '0774',
-    require => Package[$package],
+    require => Package[$bind::params::package],
   }
 
-  file { "${conf_dir}/named.conf.options":
+  file { "${bind::params::conf_dir}/named.conf.options":
     ensure  => file,
     owner   => root,
-    group   => $group,
+    group   => $bind::params::group,
     mode    => '0644',
     content => template('bind/named.conf.options.erb'),
-    require => [Package[$package], File[$conf_dir]],
+    require => [Package[$bind::params::package], File[$bind::params::conf_dir]],
   }
 
-  service { $package:
+  service { $bind::params::package:
     ensure    => running,
     enable    => true,
     pattern   => '/usr/sbin/named',
     restart   => '/etc/init.d/bind9 reload',
-    require   => Package[$package],
+    require   => Package[$bind::params::package],
     subscribe => File['/etc/bind/named.conf.options'],
   }
 
   # named.conf.local file fragments pattern, purges unmanaged files
-  $ncl = "${conf_dir}/named.conf.local"
-  # File Fragements Directory
-  $ncl_ffd = "${ncl}.d"
 
-  file { $ncl:
+  file { $bind::params::ncl:
     ensure  => file,
     owner   => root,
-    group   => $group,
+    group   => $bind::params::group,
     mode    => '0640',
-    require => [Package[$package], File[$conf_dir]],
-    notify  => Service[$service],
+    require => [Package[$bind::params::package], File[$bind::params::conf_dir]],
+    notify  => Service[$bind::params::service],
   }
 
-  file { $ncl_ffd:
+  file { $bind::params::ncl_ffd:
     ensure  => directory,
     owner   => root,
-    group   => $group,
+    group   => $bind::params::group,
     mode    => '0700',
-    require => [Package[$package], File[$ncl]],
+    require => [Package[$bind::params::package], File[$bind::params::ncl]],
     recurse => true,
     purge   => true,
     notify  => Exec['ncl_file_assemble'],
   }
 
-  $ncl_file_assemble = 'ncl_file_assemble'
-  exec { $ncl_file_assemble:
+  exec { $bind::params::ncl_file_assemble:
     refreshonly => true,
-    require     => File[$ncl_ffd],
-    notify      => Service[$service],
-    command     => "/bin/cat ${ncl_ffd}/*_named.conf.local_* > ${ncl}",
+    require     => File[$bind::params::ncl_ffd],
+    notify      => Service[$bind::params::service],
+    command     => "/bin/cat ${bind::params::ncl_ffd}/* > ${bind::params::ncl}",
   }
 
-  $ncl_preamble = "${ncl_ffd}/00_named.conf.local_preamble"
-
-  file { $ncl_preamble:
+  file { $bind::params::ncl_preamble:
     ensure  => file,
     owner   => root,
-    group   => $group,
+    group   => $bind::params::group,
     mode    => '0600',
-    require => Package[$package],
+    require => Package[$bind::params::package],
     content => template('bind/named.conf.local_preamble.erb'),
     notify  => Exec['ncl_file_assemble'],
   }
