@@ -1,19 +1,19 @@
 
-// Zone fragment for <%= name %>
+// Zone fragment for <%= @name %>
 <%- if @forwarders -%>
-zone "<%= name %>" IN {
-  type <%= mode %>;
-  forwarders { <%= forwarders %>; };
+zone "<%= @name %>" IN {
+  type <%= @mode %>;
+  forwarders { <%= @forwarders %>; };
 };
 <%- else -%>
-zone "<%= name %>" IN {
-    type <%= mode %>;
-    file "<%= scope.lookupvar('bind::params::zone_dir') %>/db.<%= name %>";
-  <% if mode == 'slave' -%>
-    masters { <%= masters %>; };
+zone "<%= @name %>" IN {
+    type <%= @mode %>;
+    file "<%= scope.lookupvar('bind::params::zone_dir') %>/db.<%= @name %>";
+  <% if @mode == 'slave' -%>
+    masters { <%= @masters %>; };
   <% end -%>
   <%- if @allow_update -%>
-    allow-update { key <%= allow_update %>; };
+    allow-update { key <%= @allow_update %>; };
   <%- end %>
 };
 <%- end -%>
